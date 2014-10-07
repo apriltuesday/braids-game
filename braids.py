@@ -5,6 +5,8 @@
 # - more levels
 # - GUI (D3)
 
+from copy import copy
+
 class BraidGame:
 
     def __init__(self):
@@ -22,11 +24,11 @@ class BraidGame:
 
     def reset(self):
         # Resets current and target to the strings in levels.
-        self.current = self.all_levels[self.level][0]
-        self.target = self.all_levels[self.level][1]
+        self.current = copy(self.all_levels[self.level][0])
+        self.target = copy(self.all_levels[self.level][1])
 
     def advance(self):
-        # Advances one level and returns true if successful..
+        # Advances one level and returns true if successful.
         self.level += 1
         if self.level >= len(self.all_levels):
             return False
@@ -42,12 +44,17 @@ class BraidGame:
 
     def unscramble(self, word):
         # Unscrambles current using the actions defined by word.
-        # Returns true if current == target.
+        # Returns true if current == target, otherwise resets
+        # and returns false.
         for char in word:
             i = self.dictionary.index(char)
             if i > -1 and i < len(self.current)-1:
                 self.swap(i, i+1)
-        return self.current == self.target
+        if self.current == self.target:
+            return True
+        else:
+            self.reset()
+            return False
 
 ### end class BraidGame
 
@@ -55,7 +62,7 @@ def play_round(game):
     # Returns true if this level not won yet.
     line = raw_input(''.join(game.current) + '?: ')
     if game.unscramble(line):
-        print 'good job!'
+        print ''.join(game.current), '==> good job!'
         return False
     else:
         print 'try again!'
