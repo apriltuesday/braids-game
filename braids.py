@@ -1,16 +1,22 @@
 # April Shen
 
-import fileinput
+# TODO:
+# - better error checking / messages
+# - more levels
+# - GUI (D3)
 
 class BraidGame:
 
     def __init__(self):
         # This string gives the order in which we define actions, from
-        # left to right.  E.g., 'e' corresponds to swapping the
+        # left to right.  E.g., 'a' corresponds to swapping the
         # leftmost two letters, etc.
-        self.dictionary = 'etaoinshrdlucmfwypvbgkjqxz'
+        self.dictionary = 'ateoinshrdlucmfwypvbgkjqxz'
         # This gives the initial and target strings for each level.
-        self.all_levels = [ (['t', 'a'], ['a', 't']) ]
+        self.all_levels = [
+            (['t', 'a'], ['a', 't']),
+            (['o', 'e', 't'], ['t', 'o', 'e'])
+            ]
         self.level = 0
         self.reset()
 
@@ -20,12 +26,13 @@ class BraidGame:
         self.target = self.all_levels[self.level][1]
 
     def advance(self):
-        # Advances one level.
+        # Advances one level and returns true if successful..
         self.level += 1
         if self.level >= len(self.all_levels):
-            print 'you win it all! :)'
+            return False
         else:
             self.reset()
+            return True
         
     def swap(self, i, j):
         # Swaps current[i] with current[j].
@@ -42,15 +49,23 @@ class BraidGame:
                 self.swap(i, i+1)
         return self.current == self.target
 
+### end class BraidGame
+
+def play_round(game):
+    # Returns true if this level not won yet.
+    line = raw_input(''.join(game.current) + '?: ')
+    if game.unscramble(line):
+        print 'good job!'
+        return False
+    else:
+        print 'try again!'
+        return True
 
 if __name__ == '__main__':
-    #args = sys.argv
-
     game = BraidGame()
     while True:
-        line = raw_input(''.join(game.current) + '?: ')
-        if game.unscramble(line):
-            print 'you win!'
+        while play_round(game):
+            pass
+        if not game.advance():
+            print 'you win it all! :)'
             break
-        else:
-            print 'try again!'
